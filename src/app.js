@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 // Ahora puedes usar __dirname
 app.use(express.static(path.join(__dirname, 'public')));
 
-/*
+
 app.get('/all', async(req,res)=>{
     try{
         const foods = await getFood()
@@ -24,7 +24,7 @@ app.get('/all', async(req,res)=>{
         res.status(500).json({ error: err });
     }
 })
-
+/*
 app.post("/newfood", async (req, res) => {
     console.log(req.body);
     const { title, description, price, img=null, isProcess=true } = req.body;

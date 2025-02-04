@@ -1,6 +1,13 @@
 import pg from 'pg';
 const { Client } = pg;
 import './config.js'
+import { Sequelize } from 'sequelize';
+
+
+const sequelize  = new Sequelize('la_papa_db','postgres','postgres',{
+    host : 'localhost',
+    dialect : 'postgres'
+})
 
 // Configura tus datos de conexión
 const client = new Client({
@@ -26,16 +33,18 @@ async function getFood() {
 }
 
 async function newFood(data) {
-    const json = JSON.parse(data)
-    const query = `
-        INSERT INTO food (title, description, price, img, isprocess) 
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *;`;
-
-    const values = [json.title, json.description, json.price, json.img, json.isprocess];
-
-    const result = await client.query(query, values);
-    return result.rows;// Esto devolverá el registro insertado
+    try{
+        const json = JSON.parse(data)
+        const query = `
+            INSERT INTO food (title, description, price, isprocess, "table", duration) 
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *;`;
+        const values = [json.title, json.description, json.price, json.isprocess, json.table, json.duration];
+        const result = await client.query(query, values);
+        return result.rows; 
+    }catch(err){
+        console.error("Error executing query:", err);
+    }
 }
 
 async function deleteFood(id) {
@@ -64,4 +73,4 @@ async function updateFood(food) {
 }
 
 
-export { client, connect, getFood, newFood, deleteFood, getNote, updateFood };
+export { client, connect, getFood, newFood, deleteFood, getNote, updateFood, sequelize };

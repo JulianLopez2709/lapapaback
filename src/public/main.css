@@ -8,7 +8,8 @@
     padding: 0;
 }
 
-html, body{
+html,
+body {
     height: 100%;
     margin: 0;
 }
@@ -31,14 +32,20 @@ header img {
 
 nav {
     display: flex;
+    align-items: center;
     justify-content: space-between;
 }
 
-
 main {
-    flex: 1; 
+    height: 100%;
+}
+
+.container {
+    max-width: 1700px;
+    display: flex;
     padding: 20px;
-    overflow-y: auto; 
+    margin: auto;
+    margin-bottom: 20px;
 }
 
 #foodForm {
@@ -47,21 +54,42 @@ main {
     width: 100%;
 }
 
-textarea{
-    width: 50%;
-}
 
 /* General card styling */
 .card {
     display: flex;
+    flex-direction: column;
+    border: 3px solid grey;
     justify-content: space-between;
-    align-items: center;
     background-color: #f8f9fa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 15px;
-    border-radius: 10px;
+    border-radius: 20px;
     transition: box-shadow 0.3s ease;
+}
+
+
+.card-total {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+#foods {
+    overflow-y: auto;
+    /* Permite scroll vertical */
+    max-height: calc(100vh - 150px);
+    width: 75%;
+    margin-right: 10px;
+}
+
+#order {
+    width: 25%;
+    background-color: #202020;
+    border-radius: 2rem;
 }
 
 .card:hover {
@@ -74,20 +102,57 @@ textarea{
 }
 
 .title {
-    font-size: 1.5rem;
+    font-size: 2rem;
+    font-weight: 500;
+    margin-right: 15px;
+}
+
+.table {
+    font-size: 0.8rem;
+    padding: 7px 30px;
+    background-color: #ffee0028;
+    border: 2px solid rgb(255, 255, 0);
+    border-radius: 10px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 10px;
 }
 
 .description {
-    font-size: 1rem;
-    color: #666;
-    margin-bottom: 10px;
+    border-bottom: 2px solid gray;
+    display: flex;
+    flex-direction: column;
 }
 
-.price {
-    font-size: 1.25rem;
+.description-ingredient {
+    max-width: 1000px;
+    font-size: 15px;
+    max-lines: 1;
+}
+
+.description-information {
+    display: flex;
+    align-items: center;
+}
+
+.description-salsa {
+    border-radius: 7px;
+    padding: 2px 15px;
+    margin-right: 7px;
+    border: 2px solid blue;
+    background-color: #0011ff1c;
+}
+
+.description-note {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    font-size: 2.5rem;
+}
+
+.description span {
+    color: #333;
+}
+
+.card-total-precio {
+    font-size: 2rem;
     color: #28a745;
     font-weight: bold;
 }
@@ -118,8 +183,17 @@ textarea{
     background-color: #1e7e34;
 }
 
-/* Footer for the card */
+
+@media (max-width : 900px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+
 footer {
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
