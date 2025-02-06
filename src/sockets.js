@@ -1,12 +1,12 @@
-import { getFood, newFood, deleteFood, getNote, updateFood } from "./db.js";
+import { getOrders, newFood, getNote, updateFood, newOrder } from "./consulta.js";
 
 export default (io) => {
     io.on("connection", async (socket) => {
         console.log("new user connected")
 
         const emitFood = async () => {
-            const foods = await getFood()
-            io.emit('server:loadfood', foods)
+            const orders = await getOrders()
+            io.emit('server:loadfood', orders)
         }
 
         emitFood()
@@ -14,6 +14,10 @@ export default (io) => {
         socket.on('client:newfood', async (data) => {
             await newFood(data);
             emitFood()
+        })
+
+        socket.on('client:neworder', async (data) => {
+            await newOrder(data);
         })
 
         socket.on("client:deletefood", async (id)=>{

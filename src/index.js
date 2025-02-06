@@ -3,8 +3,10 @@ import { Server as WebsockerServer } from 'socket.io'
 import http from 'http';
 import { connect } from './db.js';
 import sockets from "./sockets.js";
+import { OrderFood } from "./models/OrderFood.js";
 
 connect()
+
 
 const server = http.createServer(app)
 

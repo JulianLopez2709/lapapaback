@@ -1,7 +1,7 @@
 import { DataTypes, INTEGER } from "sequelize";
-import { sequelize } from "../db";
-import { Order } from "./Order";
-import { Food } from "./food";
+import { sequelize } from "../db.js";
+import { Order } from "./Order.js";
+import { Food } from "./Food.js";
 
 export const OrderFood = sequelize.define('order_food',{
     order_food_id : {
@@ -21,6 +21,9 @@ export const OrderFood = sequelize.define('order_food',{
             key : 'order_id'
         }
     },
+    extras: {
+        type : DataTypes.JSON,
+    },
     food_id :{
         type : DataTypes.INTEGER,
         primaryKey : true,
@@ -30,3 +33,9 @@ export const OrderFood = sequelize.define('order_food',{
         }
     }
 })
+
+
+
+// Relación muchos a muchos con Food
+Order.belongsToMany(Food, { through: OrderFood, foreignKey: 'order_id' });
+Food.belongsToMany(Order, { through: OrderFood, foreignKey: 'food_id' });
