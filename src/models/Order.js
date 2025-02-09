@@ -13,7 +13,8 @@ export const Order = sequelize.define('orders',{
         type : DataTypes.INTEGER,
     },
     order_status : {
-        type : DataTypes.STRING
+        type : DataTypes.STRING,
+        defaultValue : "preparing"
     },
     total_price: {
         type: DataTypes.FLOAT,

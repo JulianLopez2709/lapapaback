@@ -2,7 +2,11 @@ import { Food } from "../models/Food.js";
 
 export const getFoodsService = async()=>{
     try {
-        const foods = await Food.findAll()
+        const foods = await Food.findAll({
+            where : {
+                available : true
+            }
+        })
         return foods
     } catch (error) {
         throw error

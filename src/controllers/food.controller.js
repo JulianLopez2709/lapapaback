@@ -3,7 +3,7 @@ import { createService, getFoodsService } from "../services/food.service.js"
 export const getFoods = async(req,res)=>{
     try {
         const foods = await getFoodsService();
-        res.status(200).send({data: foods})
+        res.status(200).send(foods)
     } catch (error) {
         res.status(500)
     }

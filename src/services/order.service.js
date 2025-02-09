@@ -1,43 +1,114 @@
+import { Op } from "sequelize";
+import { Food } from "../models/Food.js";
 import { Order } from "../models/Order.js";
 import { OrderFood } from "../models/OrderFood.js";
 
-export const createOrderService = async({user_id,foods})=>{
+export const createOrderService = async ({ user_id, foods }) => {
     try {
-        console.log(user_id, foods)
-        const newOrder = await Order.create({user_id})
-        const orderFoodData = foods.map((food)=>({
+        let total_price = 0;
+
+        const foodPrices = await Promise.all(
+            foods.map(async (item) => {
+                const food = await Food.findOne({
+                    where: { food_id: item.food_id },
+                    attributes: ['price']
+                });
+
+                return food ? food.price : 0;
+            })
+        );
+
+        total_price = foodPrices.reduce((sum, price) => sum + price, 0);
+
+        const newOrder = await Order.create({ user_id, total_price })
+
+        const orderFoodData = foods.map((food) => ({
             order_id: newOrder.order_id,
-            food_id : food.food_id,
-            quantity : food.quantity,
-            extras : food.extras
-        }))
-        
-        console.log(orderFoodData)
-        await OrderFood.bulkCreate(orderFoodData)
-        return newOrder
+            food_id: food.food_id,
+            extras: food.extras
+        }
+        ))
+
+
+        const createdOrderFoods = await OrderFood.bulkCreate(orderFoodData)
+        return { data : newOrder }
     } catch (error) {
         throw error
     }
 }
 
-export const getOrderService = async()=>{
+export const getOrderService = async () => {
     try {
-        const orders = await Order.findAll({
+        const ordersall = await Order.findAll({
             where : {
-                order_status : "preparing"
+                order_status:   "preparing" ,
+            },
+            include: [{
+                model: OrderFood,
+                attributes: ['extras'],
+                include: [{
+                    model: Food,
+                }]
             }
-        })
-        const food = orders.map( async (order)=>{
-            await OrderFood.findAll({
-                where : {
-                    order_id : order.order_id
-                }
-            })
+            ]
         })
 
-        const res = {foods : food}
-        
-        return res
+        return ordersall
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const getOrdersDayService = async () => {
+    try {
+        const now = new Date();
+
+        // Calcular el inicio y fin del día en la hora local
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        // Convertir a UTC antes de la consulta
+        const startOfDayUTC = new Date(startOfDay.getTime() - startOfDay.getTimezoneOffset() * 60000);
+        const endOfDayUTC = new Date(endOfDay.getTime() - endOfDay.getTimezoneOffset() * 60000);
+
+
+        const ordersday = await Order.findAll({
+            include: [{
+                model: OrderFood,
+                attributes: ['id'],
+                include: [{
+                    model: Food,
+                    attributes: ['name']
+                }]
+            }],
+            where: {
+                order_status: { [Op.not]: "preparing" },
+                createdAt: {
+                    [Op.between]: [startOfDayUTC, endOfDayUTC]
+                }
+            },
+        });
+        return ordersday
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const patchStatusOrderService = async (userId, status) => {
+    try {
+
+        const order = await Order.findByPk(userId)
+
+        if (!order) {
+            return { status: 400, data: "order no found" }
+        }
+
+        order.order_status = status
+        await order.save()
+
+        return { status: 200, data: "Estado Actualizado" }
     } catch (error) {
         throw error
     }
