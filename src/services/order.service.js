@@ -31,7 +31,7 @@ export const createOrderService = async ({ user_id, foods }) => {
 
 
         const createdOrderFoods = await OrderFood.bulkCreate(orderFoodData)
-        return { data : newOrder }
+        return { data: newOrder }
     } catch (error) {
         throw error
     }
@@ -40,8 +40,8 @@ export const createOrderService = async ({ user_id, foods }) => {
 export const getOrderService = async () => {
     try {
         const ordersall = await Order.findAll({
-            where : {
-                order_status:   "preparing" ,
+            where: {
+                order_status: "preparing",
             },
             include: [{
                 model: OrderFood,
@@ -68,10 +68,11 @@ export const getOrdersDayService = async () => {
         const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
         const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        // Convertir a UTC antes de la consulta
-        const startOfDayUTC = new Date(startOfDay.getTime() - startOfDay.getTimezoneOffset() * 60000);
-        const endOfDayUTC = new Date(endOfDay.getTime() - endOfDay.getTimezoneOffset() * 60000);
+        // Convertir a formato 'YYYY-MM-DD HH:mm:ss.SSS' sin zona horaria
+        const formatDate = (date) => date.toISOString().slice(0, 23).replace("T", " ");
 
+        const startOfDayStr = formatDate(startOfDay);
+        const endOfDayStr = formatDate(endOfDay);
 
         const ordersday = await Order.findAll({
             include: [{
@@ -85,7 +86,7 @@ export const getOrdersDayService = async () => {
             where: {
                 order_status: { [Op.not]: "preparing" },
                 createdAt: {
-                    [Op.between]: [startOfDayUTC, endOfDayUTC]
+                    [Op.between]: [startOfDayStr, endOfDayStr]
                 }
             },
         });
@@ -96,10 +97,10 @@ export const getOrdersDayService = async () => {
 }
 
 
-export const patchStatusOrderService = async (userId, status) => {
+export const patchStatusOrderService = async (orderId, status) => {
     try {
 
-        const order = await Order.findByPk(userId)
+        const order = await Order.findByPk(orderId)
 
         if (!order) {
             return { status: 400, data: "order no found" }

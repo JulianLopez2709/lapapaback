@@ -1,29 +1,25 @@
 import { getOrders, newFood, getNote, updateFood, newOrder } from "./consulta.js";
-import { createOrderService, getOrderService } from "./services/order.service.js";
+import { createOrderService, getOrderService, patchStatusOrderService } from "./services/order.service.js";
 
 export default (io) => {
     io.on("connection", async (socket) => {
         console.log("new user connected")
 
-        const emitFood = async () => {
+        const emitOrder = async () => {
             const orders = await getOrderService()
-            io.emit('server:loadfood', orders)
+            io.emit('server:loadOrder', orders)
         }
 
-        emitFood()
+        emitOrder()
 
-        socket.on('client:newfood', async (data) => {
-            await newFood(data);
-            emitFood()
+        socket.on('client:newOrder', async ({ user_id, foods }) => {
+            await createOrderService({ user_id, foods });
+            emitOrder()
         })
 
-        socket.on('client:neworder', async (data) => {
-            await createOrderService(data);
-        })
-
-        socket.on("client:deletefood", async (id)=>{
-            await deleteFood(id)
-            emitFood()
+        socket.on("client:patchStatus", async (data)=>{
+            await patchStatusOrderService(data.orderId, data.status)
+            emitOrder()
         })
 
         socket.on("disconnect", () => {
@@ -40,15 +36,5 @@ export default (io) => {
             io.emit('server:test', e)
         })
 
-
-        socket.on('client:getfood',async(e)=>{
-            let food = await getNote(e)
-            socket.emit('server:getfood', food)
-        })
-
-        socket.on('client:update', async (food)=>{
-            await updateFood(food)
-            emitFood()
-        })
     })
 }
