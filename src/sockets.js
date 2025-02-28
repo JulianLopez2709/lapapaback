@@ -1,5 +1,4 @@
-import { getOrders, newFood, getNote, updateFood, newOrder } from "./consulta.js";
-import { createOrderService, getOrderService, patchStatusOrderService } from "./services/order.service.js";
+import { createOrderService, getOrderService, patchStatusOrderService, addOrderService } from "./services/order.service.js";
 
 export default (io) => {
     io.on("connection", async (socket) => {
@@ -12,13 +11,25 @@ export default (io) => {
 
         emitOrder()
 
-        socket.on('client:newOrder', async ({ user_id, foods }) => {
-            await createOrderService({ user_id, foods });
+        socket.on('client:newOrder', async (data) => {
+            const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+            const user_id= parsedData.user_id
+            const foods = parsedData.foods
+            const table = parsedData.table
+            await createOrderService({ user_id, foods, table });
+            emitOrder()
+        })  
+
+        socket.on("client:patchStatus", async (data) => {
+            const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+            await patchStatusOrderService(parsedData.orderId, parsedData.status)
             emitOrder()
         })
 
-        socket.on("client:patchStatus", async (data)=>{
-            await patchStatusOrderService(data.orderId, data.status)
+
+        socket.on("client:addOrder", async (data) => {
+            const parsedData = typeof data === "string" ? JSON.parse(data) : data;
+            await addOrderService(parsedData.order_id, parsedData.foods)
             emitOrder()
         })
 
@@ -31,7 +42,7 @@ export default (io) => {
         });
 
 
-        socket.on('client:test', (e)=>{
+        socket.on('client:test', (e) => {
             console.log(e)
             io.emit('server:test', e)
         })

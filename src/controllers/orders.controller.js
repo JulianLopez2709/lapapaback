@@ -1,4 +1,4 @@
-import { createOrderService, getOrderService, getOrdersDayService, patchStatusOrderService } from "../services/order.service.js";
+import { createOrderService, getOrderService, getOrdersDayService, patchStatusOrderService, addOrderService } from "../services/order.service.js";
 
 export const getOrders = async(req,res)=>{
     try{
@@ -10,9 +10,9 @@ export const getOrders = async(req,res)=>{
 }
 
 export const create = async(req, res)=>{
-    const {user_id=1,foods} = req.body
+    const {user_id=1,foods, table} = req.body
     try {
-        const created = await createOrderService({user_id,foods})
+        const created = await createOrderService({user_id,foods,table})
         res.status(201).send(created); 
     } catch (error) {
         res.status(500)
@@ -40,5 +40,17 @@ export const patchOrder = async(req, res)=>{
     } catch (error) {
         res.status(500)
         
+    }
+}
+
+
+export const addOrder = async(req, res)=>{
+    const newFood = req.body
+    const id = req.params.id
+    try {
+        const result = await addOrderService(id, newFood)
+        res.status(result.status).send(result.data)
+    } catch (error) {
+        res.status(500)
     }
 }

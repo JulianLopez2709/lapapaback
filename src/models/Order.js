@@ -12,6 +12,10 @@ export const Order = sequelize.define('orders',{
     user_id: {
         type : DataTypes.INTEGER,
     },
+    table : {
+        type : DataTypes.INTEGER,
+        defaultValue: 1
+    },
     order_status : {
         type : DataTypes.STRING,
         defaultValue : "preparing"

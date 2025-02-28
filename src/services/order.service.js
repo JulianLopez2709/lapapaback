@@ -1,9 +1,9 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import { Food } from "../models/Food.js";
 import { Order } from "../models/Order.js";
 import { OrderFood } from "../models/OrderFood.js";
 
-export const createOrderService = async ({ user_id, foods }) => {
+export const createOrderService = async ({ user_id, foods, table }) => {
     try {
         let total_price = 0;
 
@@ -20,7 +20,7 @@ export const createOrderService = async ({ user_id, foods }) => {
 
         total_price = foodPrices.reduce((sum, price) => sum + price, 0);
 
-        const newOrder = await Order.create({ user_id, total_price })
+        const newOrder = await Order.create({ user_id, total_price, table })
 
         const orderFoodData = foods.map((food) => ({
             order_id: newOrder.order_id,
@@ -110,6 +110,58 @@ export const patchStatusOrderService = async (orderId, status) => {
         await order.save()
 
         return { status: 200, data: "Estado Actualizado" }
+    } catch (error) {
+        throw error
+    }
+}
+
+
+export const addOrderService = async (id, newFood) => {
+    try {
+        const order = await Order.findOne({
+            attributes: ["order_id", "total_price"],
+            where: {
+                order_id: id
+            }
+        })
+
+        if (!order) {
+            return { status: 400, data: "order no found" }
+        }
+
+        // Obtener los precios de los nuevos productos agregados
+        const foodPrices = await Food.findAll({
+            attributes: ["food_id", "price"],
+            where: { food_id: newFood.map(food => food.food_id) }
+        });
+
+        // Mapear los precios de los alimentos agregados
+        const foodPriceMap = foodPrices.reduce((acc, food) => {
+            acc[food.food_id] = food.price;
+            return acc;
+        }, {});
+
+        // Calcular el costo total de los nuevos productos
+        const additionalPrice = newFood.reduce((sum, food) => {
+            return sum + (foodPriceMap[food.food_id] || 0);
+        }, 0);
+
+        const orderFoodData = newFood.map((food) => ({
+            order_id: order.order_id,
+            food_id: food.food_id,
+            extras: food.extras
+        }
+        ))
+
+        await OrderFood.bulkCreate(orderFoodData)
+
+        await Order.update(
+            { total_price: order.total_price + additionalPrice },
+            { where: { order_id: order.order_id } }
+        );
+
+        return { status: 200, data: `Se añadio productos a la order : ${order.order_id}` }
+
     } catch (error) {
         throw error
     }
