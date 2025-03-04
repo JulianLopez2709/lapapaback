@@ -15,6 +15,10 @@ export const OrderFood = sequelize.define('order_food', {
     extras: {
         type: DataTypes.JSON,
     },
+    notes: {
+        type: DataTypes.STRING,
+        defaultValue : null
+    },
     food_id: {
         type: DataTypes.INTEGER,
     }

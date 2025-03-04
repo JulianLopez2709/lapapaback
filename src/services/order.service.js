@@ -25,7 +25,8 @@ export const createOrderService = async ({ user_id, foods, table }) => {
         const orderFoodData = foods.map((food) => ({
             order_id: newOrder.order_id,
             food_id: food.food_id,
-            extras: food.extras
+            extras: food.extras,
+            notes : food.notes
         }
         ))
 
@@ -45,7 +46,7 @@ export const getOrderService = async () => {
             },
             include: [{
                 model: OrderFood,
-                attributes: ['extras'],
+                attributes: ['extras','notes'],
                 include: [{
                     model: Food,
                 }]
@@ -149,7 +150,8 @@ export const addOrderService = async (id, newFood) => {
         const orderFoodData = newFood.map((food) => ({
             order_id: order.order_id,
             food_id: food.food_id,
-            extras: food.extras
+            extras: food.extras,
+            notes: food.notes
         }
         ))
 
