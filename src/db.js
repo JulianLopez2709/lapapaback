@@ -3,14 +3,16 @@ import './config.js'
 import { Sequelize } from 'sequelize';
 
 
-const sequelize  = new Sequelize('la_papa_db','postgres','postgres',{
-    host : 'localhost',
-    dialect : 'postgres'
+const sequelize  = new Sequelize(process.env.DB_NAME,process.env.DB_USER,process.env.DB_PASS,{
+    host : process.env.DB_HOST,
+    port : process.env.DB_PORT || 5432,
+    dialect : 'postgres',
+    dialectModule : pg
 })
 
 async function connect() {
     try {
-        await sequelize.sync({ force: false });
+        await sequelize.authenticate();
         console.log('Conectado a la base de datos');
     } catch (err) {
         console.error('Error al conectar a la base de datos', err);
