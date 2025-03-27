@@ -41,7 +41,7 @@ export const createOrderService = async ({ user_id, foods, table }) => {
 export const getOrderService = async () => {
     try {
         const now = new Date();
-        
+
         // Ajustar para el inicio del día (2AM Colombia)
         const todayStart = new Date(now);
         todayStart.setHours(2, 0, 0, 0);
@@ -57,13 +57,13 @@ export const getOrderService = async () => {
         endDate.setHours(1, 59, 59, 999);
         
         // Ajustar a UTC para la consulta
-        const utcTodayStart = new Date(todayStart.getTime() - (5 * 60 * 60 * 1000));
-        const utcEndDate = new Date(endDate.getTime() - (5 * 60 * 60 * 1000));
+        //const utcTodayStart = new Date(todayStart.getTime() - (5 * 60 * 60 * 1000));
+        //const utcEndDate = new Date(endDate.getTime() - (5 * 60 * 60 * 1000));
 
         const ordersall = await Order.findAll({
             where: {
                 createdAt: {
-                    [Op.between]: [utcTodayStart, utcEndDate]
+                    [Op.between]: [todayStart, endDate]
                 }
             },
             include: [{
