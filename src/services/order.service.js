@@ -41,11 +41,13 @@ export const createOrderService = async ({ user_id, foods, table }) => {
 export const getOrderService = async () => {
     try {
         const todayStart = new Date();
-        todayStart.setHours(14, 0, 0, 0); 
+        console.log(todayStart)
+        todayStart.setHours(3, 0, 0, 0); 
         
         const endDate = new Date(todayStart);
+        console.log(endDate)
         endDate.setDate(endDate.getDate() + 1);
-        endDate.setHours(14, 0, 0, 0); 
+        endDate.setHours(2, 59, 59, 0);    
 
         const ordersall = await Order.findAll({
             where: {
