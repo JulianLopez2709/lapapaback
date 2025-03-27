@@ -26,7 +26,7 @@ export const createOrderService = async ({ user_id, foods, table }) => {
             order_id: newOrder.order_id,
             food_id: food.food_id,
             extras: food.extras,
-            notes : food.notes
+            notes: food.notes
         }
         ))
 
@@ -40,18 +40,25 @@ export const createOrderService = async ({ user_id, foods, table }) => {
 
 export const getOrderService = async () => {
     try {
+        const todayStart = new Date();
+        todayStart.setHours(14, 0, 0, 0); 
+        
+        const endDate = new Date(todayStart);
+        endDate.setDate(endDate.getDate() + 1);
+        endDate.setHours(14, 0, 0, 0); 
+
         const ordersall = await Order.findAll({
             where: {
-                order_status: "preparing",
+                createdAt: {
+                    [Op.between]: [todayStart, endDate]
+                }
             },
             include: [{
                 model: OrderFood,
-                attributes: ['extras','notes'],
-                include: [{
-                    model: Food,
-                }]
-            }
-            ]
+                attributes: ['extras', 'notes'],
+                include: [Food]
+            }],
+            
         })
 
         return ordersall
