@@ -44,17 +44,17 @@ export const getOrderService = async () => {
 
         // Ajustar para el inicio del día (2AM Colombia)
         const todayStart = new Date(now);
-        todayStart.setHours(2, 0, 0, 0);
+        todayStart.setHours(7, 0, 0, 0);
         
         // Si son menos de las 2AM, considerar que es parte del día anterior
-        if (now.getHours() < 2) {
+        if (now.getHours() < 7) {
             todayStart.setDate(todayStart.getDate() - 1);
         }
         
         // Fin del día (1:59:59 AM del día siguiente)
         const endDate = new Date(todayStart);
         endDate.setDate(endDate.getDate() + 1);
-        endDate.setHours(1, 59, 59, 999);
+        endDate.setHours(6, 59, 59, 999);
         
         // Ajustar a UTC para la consulta
         //const utcTodayStart = new Date(todayStart.getTime() - (5 * 60 * 60 * 1000));
