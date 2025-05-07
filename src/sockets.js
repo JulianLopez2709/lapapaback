@@ -16,7 +16,8 @@ export default (io) => {
             const user_id= parsedData.user_id
             const foods = parsedData.foods
             const table = parsedData.table
-            await createOrderService({ user_id, foods, table });
+            const total_price = parsedData.total_price
+            await createOrderService({ user_id, foods, table,total_price });
             emitOrder()
         })  
 
@@ -29,7 +30,7 @@ export default (io) => {
 
         socket.on("client:addOrder", async (data) => {
             const parsedData = typeof data === "string" ? JSON.parse(data) : data;
-            await addOrderService(parsedData.order_id, parsedData.foods)
+            await addOrderService(parsedData.order_id, parsedData.foods, parsedData.total_price = 0)
             emitOrder()
         })
 

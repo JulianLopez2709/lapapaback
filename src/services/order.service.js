@@ -3,24 +3,11 @@ import { Food } from "../models/Food.js";
 import { Order } from "../models/Order.js";
 import { OrderFood } from "../models/OrderFood.js";
 
-export const createOrderService = async ({ user_id, foods, table }) => {
+export const createOrderService = async ({ user_id, foods, table, total_price= 0}) => {
     try {
-        let total_price = 0;
-
-        const foodPrices = await Promise.all(
-            foods.map(async (item) => {
-                const food = await Food.findOne({
-                    where: { food_id: item.food_id },
-                    attributes: ['price']
-                });
-
-                return food ? food.price : 0;
-            })
-        );
-
-        total_price = foodPrices.reduce((sum, price) => sum + price, 0);
-
-        const newOrder = await Order.create({ user_id, total_price, table })
+        //const totalPrice = foods.reduce((sum, food) => sum + food.price, 0)
+        console.log("totalPrice", total_price)
+        const newOrder = await Order.create({ user_id, total_price , table })
 
         const orderFoodData = foods.map((food) => ({
             order_id: newOrder.order_id,
@@ -137,7 +124,7 @@ export const patchStatusOrderService = async (orderId, status) => {
 }
 
 
-export const addOrderService = async (id, newFood) => {
+export const addOrderService = async (id, newFood, total_price) => {
     try {
         const order = await Order.findOne({
             attributes: ["order_id", "total_price"],
